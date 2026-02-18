@@ -6,7 +6,7 @@ import { Send } from "lucide-react";
 import Window from "../desktop/Window";
 import { useChat } from "@/lib/useChat";
 
-export default function ChatWindow({ viewers = 1247 }: { viewers?: number }) {
+export default function ChatWindow() {
   const { messages, isConnected, sendMessage } = useChat();
   const [inputValue, setInputValue] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -38,7 +38,6 @@ export default function ChatWindow({ viewers = 1247 }: { viewers?: number }) {
           className={`h-1.5 w-1.5 rounded-full ${isConnected ? "bg-accent-green" : "bg-accent-red"}`}
           style={isConnected ? { animation: "pulse-alive 2s infinite" } : undefined}
         />
-        <span className="font-mono text-[9px] text-text-muted">{viewers.toLocaleString()} Live</span>
       </div>
     }>
       <div className="flex h-full flex-col">
