@@ -100,10 +100,6 @@ export default function MenuBar({
           </div>
           <span className="font-mono text-[11px] text-text-secondary">${credits.toFixed(4)}</span>
         </div>
-        <div className="hidden items-center gap-1 sm:flex">
-          <span className="text-[10px] text-text-muted">live</span>
-          <span className="font-mono text-[11px] text-text-secondary">{viewers.toLocaleString()}</span>
-        </div>
         <span className="font-mono text-[11px] text-text-muted">{time}</span>
       </div>
     </motion.div>
