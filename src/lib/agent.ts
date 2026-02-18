@@ -131,13 +131,24 @@ export async function restoreLogsFromDB(): Promise<void> {
       console.log("[AGENT] Failed to restore trades from DB:", tradeError.message);
     } else if (tradeData && tradeData.length > 0 && tradeStore.length === 0) {
       for (const row of tradeData) {
+        // Parse pnlValue from the pnl string (e.g. "+$0.0432" or "-$0.0123")
+        let pnlValue = 0;
+        if (row.pnl_value != null) {
+          pnlValue = parseFloat(row.pnl_value) || 0;
+        } else if (row.pnl) {
+          const cleaned = row.pnl.replace(/[$+]/g, "");
+          pnlValue = parseFloat(cleaned) || 0;
+        }
+        // Use the `positive` column as a sanity check
+        if (row.positive === false && pnlValue > 0) pnlValue = -Math.abs(pnlValue);
+
         tradeStore.push({
           time: row.time,
           pair: row.pair,
           side: row.side,
-          pnl: row.pnl,
-          pnlValue: parseFloat(row.pnl_value) || 0,
-          apiCost: row.api_cost,
+          pnl: row.pnl || (pnlValue >= 0 ? `+$${pnlValue.toFixed(4)}` : `-$${Math.abs(pnlValue).toFixed(4)}`),
+          pnlValue,
+          apiCost: row.api_cost || "$0.000000",
           confidence: row.confidence || 0,
         });
       }
@@ -454,7 +465,6 @@ export async function runAgentCycle(): Promise<AgentLogEntry[]> {
                   pair: lastTrade.pair,
                   side: lastTrade.side,
                   pnl: lastTrade.pnl,
-                  pnl_value: lastTrade.pnlValue,
                   api_cost: lastTrade.apiCost,
                   positive: lastTrade.pnlValue >= 0,
                   confidence: lastTrade.confidence,
